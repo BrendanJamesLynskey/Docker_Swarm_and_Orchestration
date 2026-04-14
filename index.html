@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docker Swarm &amp; Orchestration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/black.min.css">
+<style>
+  :root { --amber:#f5a623; --green:#4ecb8d; --purple:#a78bfa; --blue:#60a5fa; --red:#f87171; --bg:#0a0a0f; --bg2:#10101a; --bg3:#181824; --border:#2a2a3a; --text:#e8e8f0; --muted:#8888a8; }
+  .reveal-viewport { background: var(--bg); }
+  .reveal .slides section { background: transparent; }
+  .reveal { font-family: 'DM Sans', sans-serif; color: var(--text); }
+  .reveal h1,.reveal h2,.reveal h3 { font-family: 'Playfair Display', serif; font-weight: 700; }
+  .reveal h1 { font-size: 1.6em; color: var(--amber); line-height: 1.1; }
+  .reveal h2 { font-size: 1.1em; color: var(--amber); margin-bottom: .2em; }
+  .reveal h3 { font-size: .78em; color: var(--green); margin-bottom: .15em; }
+  .reveal p { font-size: .56em; line-height: 1.45; color: var(--text); }
+  .reveal li { font-size: .54em; line-height: 1.45; margin-bottom: .1em; }
+  .reveal code { font-family: 'JetBrains Mono', monospace; font-size: .72em; }
+  .reveal pre { box-shadow: none; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: .3em .5em; margin: .25em 0; }
+  .reveal pre code { font-size: .52em; line-height: 1.35; background: transparent; color: #cdd6f4; }
+  .slide-hdr { display: flex; align-items: center; gap: .4em; border-bottom: 1px solid var(--border); padding-bottom: .2em; margin-bottom: .3em; }
+  .slide-hdr .tag { font-family: 'JetBrains Mono', monospace; font-size: .42em; font-weight: 500; color: var(--bg); background: var(--amber); padding: .1em .4em; border-radius: 3px; letter-spacing: .04em; }
+  .slide-hdr h2 { margin: 0; font-size: .95em; }
+  .cols { display: grid; gap: .5em; } .cols-2 { grid-template-columns: 1fr 1fr; } .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: .35em .6em; }
+  .card.amber { border-left: 3px solid var(--amber); } .card.green { border-left: 3px solid var(--green); }
+  .card.purple { border-left: 3px solid var(--purple); } .card.blue { border-left: 3px solid var(--blue); }
+  .card.red { border-left: 3px solid var(--red); }
+  .card h3 { font-size: .64em; margin: 0 0 .12em; } .card p { font-size: .52em; margin: 0; color: #b8b8d0; }
+  .card ul { margin: 0; padding-left: 1em; } .card li { font-size: .52em; color: #b8b8d0; margin-bottom: .02em; }
+  .reveal table { width: 100%; border-collapse: collapse; font-size: .5em; }
+  .reveal table th { background: var(--bg3); color: var(--amber); font-weight: 600; padding: .2em .4em; border: 1px solid var(--border); text-align: left; }
+  .reveal table td { padding: .18em .4em; border: 1px solid var(--border); color: #ccc; }
+  .reveal table tr:nth-child(even) td { background: #0e0e18; }
+  .a { color: var(--amber); font-weight: 600; } .g { color: var(--green); font-weight: 600; }
+  .p { color: var(--purple); font-weight: 600; } .b { color: var(--blue); font-weight: 600; }
+  .r { color: var(--red); font-weight: 600; } .mono { font-family: 'JetBrains Mono', monospace; }
+  .pill { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: .44em; padding: .08em .4em; border-radius: 99px; border: 1px solid; margin: 0 .08em; }
+  .pill.amber { color: var(--amber); border-color: var(--amber); } .pill.green { color: var(--green); border-color: var(--green); }
+  .pill.purple { color: var(--purple); border-color: var(--purple); } .pill.blue { color: var(--blue); border-color: var(--blue); }
+  .reveal .slide-footer { display: none; }
+  .title-slide h1 { font-size: 1.8em; }
+  .title-slide .subtitle { font-size: .7em; color: var(--green); font-family: 'DM Sans', sans-serif; font-weight: 300; letter-spacing: .04em; margin: .3em 0 .6em; }
+  .title-slide .meta { font-size: .48em; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+  .ss-row { display: flex; gap: .25em; align-items: center; margin: .1em 0; font-size: .55em; font-family: 'JetBrains Mono', monospace; }
+  .ss-node { padding: .2em .55em; border-radius: 5px; font-size: .9em; background: var(--bg3); border: 1px solid var(--border); color: var(--text); }
+  .ss-node.active { background: #1a2a1a; border-color: var(--green); color: var(--green); }
+  .ss-node.done { background: #1a1a2a; border-color: var(--purple); color: var(--purple); }
+  .ss-arrow { color: var(--amber); }
+  .reveal ul, .reveal ol { margin: .15em 0 .15em 1em; }
+  .reveal .slides > section { display: flex !important; flex-direction: column !important; overflow-y: auto !important; align-items: stretch !important; justify-content: flex-start !important; }
+</style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+
+<!-- ═══════════════════════════════ SLIDE 01 — TITLE ═══════════════════════════════ -->
+<section class="title-slide" data-background-color="#0a0a0f">
+  <div style="text-align:left; max-width:820px; margin:0 auto; padding: 1em 0;">
+    <div style="font-family:'JetBrains Mono',monospace; font-size:.5em; color:var(--muted); margin-bottom:.4em; letter-spacing:.1em;">
+      TECHNICAL PRESENTATION
+    </div>
+    <h1>Docker Swarm &amp;<br>Orchestration</h1>
+    <div class="subtitle">Clustering, Scaling, and Managing Containerised Workloads</div>
+    <div style="width:60px; height:3px; background:var(--amber); margin-bottom:1.4em;"></div>
+    <div style="display:flex; gap:1.2em; flex-wrap:wrap; margin-bottom:1em;">
+      <span class="pill amber">Swarm</span>
+      <span class="pill green">Orchestration</span>
+      <span class="pill purple">Clustering</span>
+      <span class="pill blue">Services</span>
+    </div>
+    <div class="ss-row" style="margin-top:0.6em;">
+      <span class="ss-node active">Init</span>
+      <span class="ss-arrow">&rarr;</span>
+      <span class="ss-node active">Join</span>
+      <span class="ss-arrow">&rarr;</span>
+      <span class="ss-node active">Deploy</span>
+      <span class="ss-arrow">&rarr;</span>
+      <span class="ss-node done">Scale</span>
+      <span class="ss-arrow">&rarr;</span>
+      <span class="ss-node done">Monitor</span>
+    </div>
+    <p style="max-width:620px; color:#a0a0c0; font-size:.56em; line-height:1.5; margin-top:1em;">
+      Native Docker clustering &mdash; turning a pool of Docker hosts into a single virtual system for high-availability, load balancing, and zero-downtime deployments.
+    </p>
+    <div class="meta" style="margin-top:1.4em;">
+      Cluster &nbsp;&middot;&nbsp; Scale &nbsp;&middot;&nbsp; Heal &nbsp;&middot;&nbsp; Deploy
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 02 — TOPICS ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">01</span>
+    <h2>Topics</h2>
+  </div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Swarm Fundamentals</h3>
+        <ul>
+          <li>What is container orchestration</li>
+          <li>Swarm architecture &amp; Raft consensus</li>
+          <li>Initialising a Swarm cluster</li>
+          <li>Services, tasks, and replicas</li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-top:0.5em;">
+        <h3 class="g">Networking &amp; Discovery</h3>
+        <ul>
+          <li>Service discovery and DNS</li>
+          <li>Overlay networking</li>
+          <li>Load balancing &amp; routing mesh</li>
+          <li>Ingress network</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card purple">
+        <h3 class="p">Deployments &amp; Security</h3>
+        <ul>
+          <li>Rolling updates and rollbacks</li>
+          <li>Docker Stacks &amp; stack files</li>
+          <li>Secrets and configs</li>
+          <li>Health checks &amp; self-healing</li>
+        </ul>
+      </div>
+      <div class="card blue" style="margin-top:0.5em;">
+        <h3 class="b">Operations &amp; Comparison</h3>
+        <ul>
+          <li>Placement constraints &amp; preferences</li>
+          <li>Scaling strategies</li>
+          <li>Monitoring Swarm clusters</li>
+          <li>Swarm vs Kubernetes</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 03 — WHAT IS ORCHESTRATION ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">02</span>
+    <h2>What Is Container Orchestration?</h2>
+  </div>
+  <p>Container orchestration <span class="a">automates the deployment, scaling, networking, and management</span> of containerised applications across a cluster of machines.</p>
+  <div class="cols cols-2">
+    <div>
+      <div class="card red">
+        <h3 class="r">Without Orchestration</h3>
+        <ul>
+          <li>Manually start/stop containers on each host</li>
+          <li>No automatic failover when a node dies</li>
+          <li>Manual load balancing and port management</li>
+          <li>Scaling means SSH-ing into servers</li>
+          <li>Rolling updates are error-prone scripts</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card green">
+        <h3 class="g">With Orchestration</h3>
+        <ul>
+          <li>Declare desired state, orchestrator enforces it</li>
+          <li>Automatic rescheduling on node failure</li>
+          <li>Built-in service discovery &amp; load balancing</li>
+          <li>Scale with a single command</li>
+          <li>Zero-downtime rolling updates</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="card amber" style="margin-top:0.5em;">
+    <h3 class="a">Key Orchestrators</h3>
+    <p><span class="a">Docker Swarm</span> &mdash; built into Docker Engine, simple to set up &nbsp;|&nbsp; <span class="b">Kubernetes</span> &mdash; industry standard, highly extensible &nbsp;|&nbsp; <span class="p">Nomad</span> &mdash; HashiCorp, multi-workload scheduler</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 04 — SWARM ARCHITECTURE ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">03</span>
+    <h2>Docker Swarm Architecture</h2>
+  </div>
+  <p>A Swarm cluster consists of <span class="a">manager nodes</span> (control plane) and <span class="g">worker nodes</span> (data plane). Managers use the <span class="p">Raft consensus algorithm</span> to maintain a consistent cluster state.</p>
+  <div class="cols cols-3">
+    <div class="card amber">
+      <h3 class="a">Manager Nodes</h3>
+      <ul>
+        <li>Maintain cluster state via Raft</li>
+        <li>Schedule services onto workers</li>
+        <li>Serve the Swarm API</li>
+        <li>Odd number recommended (3 or 5)</li>
+        <li>Can also run workloads</li>
+      </ul>
+    </div>
+    <div class="card green">
+      <h3 class="g">Worker Nodes</h3>
+      <ul>
+        <li>Execute containers (tasks)</li>
+        <li>Report task state to managers</li>
+        <li>No access to cluster state</li>
+        <li>Can be promoted to manager</li>
+        <li>Horizontally scalable</li>
+      </ul>
+    </div>
+    <div class="card purple">
+      <h3 class="p">Raft Consensus</h3>
+      <ul>
+        <li>Leader election among managers</li>
+        <li>Tolerates (N-1)/2 failures</li>
+        <li>3 managers &rarr; tolerates 1 failure</li>
+        <li>5 managers &rarr; tolerates 2 failures</li>
+        <li>Consistent distributed log</li>
+      </ul>
+    </div>
+  </div>
+  <div class="ss-row" style="margin-top:0.5em; justify-content:center;">
+    <span class="ss-node active">Manager 1 (Leader)</span>
+    <span class="ss-arrow">&harr;</span>
+    <span class="ss-node active">Manager 2</span>
+    <span class="ss-arrow">&harr;</span>
+    <span class="ss-node active">Manager 3</span>
+  </div>
+  <div class="ss-row" style="justify-content:center;">
+    <span class="ss-arrow">&darr;</span>
+    <span style="width:8em;"></span>
+    <span class="ss-arrow">&darr;</span>
+    <span style="width:8em;"></span>
+    <span class="ss-arrow">&darr;</span>
+  </div>
+  <div class="ss-row" style="justify-content:center;">
+    <span class="ss-node done">Worker 1</span>
+    <span style="width:2em;"></span>
+    <span class="ss-node done">Worker 2</span>
+    <span style="width:2em;"></span>
+    <span class="ss-node done">Worker 3</span>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 05 — INITIALISING A SWARM ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">04</span>
+    <h2>Initialising a Swarm Cluster</h2>
+  </div>
+  <p>Swarm mode is <span class="a">built into Docker Engine</span> &mdash; no extra software needed. One command creates the cluster.</p>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Create the Swarm (on manager)</h3>
+      </div>
+      <pre><code class="language-bash"># Initialise the swarm on the first manager
+docker swarm init --advertise-addr 192.168.1.10
+
+# Output includes a join token for workers
+# Swarm initialized: current node is now a manager</code></pre>
+      <div class="card green" style="margin-top:0.3em;">
+        <h3 class="g">Join as Worker</h3>
+      </div>
+      <pre><code class="language-bash"># Run on each worker node
+docker swarm join \
+  --token SWMTKN-1-xxx...xxx \
+  192.168.1.10:2377</code></pre>
+    </div>
+    <div>
+      <div class="card purple">
+        <h3 class="p">Join as Manager</h3>
+      </div>
+      <pre><code class="language-bash"># Get the manager join token
+docker swarm join-token manager
+
+# Run on additional manager nodes
+docker swarm join \
+  --token SWMTKN-1-yyy...yyy \
+  192.168.1.10:2377</code></pre>
+      <div class="card blue" style="margin-top:0.3em;">
+        <h3 class="b">Verify the Cluster</h3>
+      </div>
+      <pre><code class="language-bash"># List all nodes
+docker node ls
+# ID          HOSTNAME   STATUS  AVAILABILITY  ROLE
+# abc123 *   manager1   Ready   Active        Leader
+# def456     worker1    Ready   Active
+# ghi789     worker2    Ready   Active</code></pre>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 06 — SERVICES, TASKS, REPLICAS ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">05</span>
+    <h2>Services, Tasks, and Replicas</h2>
+  </div>
+  <p>In Swarm, you deploy <span class="a">services</span> (not individual containers). Each service spawns one or more <span class="g">tasks</span>, and each task runs exactly one container.</p>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Service Types</h3>
+        <ul>
+          <li><span class="a">Replicated</span> &mdash; run N copies, Swarm distributes them across nodes</li>
+          <li><span class="p">Global</span> &mdash; run exactly one task on every node (e.g., monitoring agents)</li>
+        </ul>
+      </div>
+      <pre><code class="language-bash"># Create a replicated service
+docker service create \
+  --name web \
+  --replicas 3 \
+  -p 80:80 \
+  nginx:alpine
+
+# Create a global service
+docker service create \
+  --name node-exporter \
+  --mode global \
+  prom/node-exporter</code></pre>
+    </div>
+    <div>
+      <div class="card green">
+        <h3 class="g">Inspect and Manage</h3>
+      </div>
+      <pre><code class="language-bash"># List services
+docker service ls
+
+# See task placement
+docker service ps web
+# ID       NAME    NODE      STATE
+# a1b2c3   web.1   worker1   Running
+# d4e5f6   web.2   worker2   Running
+# g7h8i9   web.3   manager1  Running
+
+# View service details
+docker service inspect --pretty web
+
+# View logs across all replicas
+docker service logs web</code></pre>
+      <div class="card blue" style="margin-top:0.3em;">
+        <h3 class="b">Task Lifecycle</h3>
+        <p><span class="mono">New &rarr; Pending &rarr; Assigned &rarr; Accepted &rarr; Preparing &rarr; Starting &rarr; Running &rarr; Complete</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 07 — SERVICE DISCOVERY & DNS ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">06</span>
+    <h2>Service Discovery and DNS</h2>
+  </div>
+  <p>Swarm has a <span class="a">built-in DNS server</span> that automatically assigns each service a DNS entry. Containers can reach other services simply by name.</p>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">How It Works</h3>
+        <ul>
+          <li>Each service gets a <span class="a">Virtual IP (VIP)</span> on the overlay network</li>
+          <li>DNS resolves the service name to the VIP</li>
+          <li>VIP load-balances across all healthy tasks</li>
+          <li>No external service registry required</li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-top:0.4em;">
+        <h3 class="g">DNS Round-Robin (alternative)</h3>
+        <ul>
+          <li>Use <code>--endpoint-mode dnsrr</code></li>
+          <li>DNS returns all task IPs directly</li>
+          <li>Useful when external LB handles distribution</li>
+          <li>No VIP &mdash; client decides which IP to use</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <pre><code class="language-bash"># Services on the same overlay network
+# can resolve each other by name
+docker service create --name api \
+  --network backend \
+  myapp/api
+
+docker service create --name db \
+  --network backend \
+  postgres:16
+
+# Inside "api" container:
+# ping db        => resolves to VIP 10.0.1.5
+# nslookup db    => returns 10.0.1.5 (VIP)
+
+# With DNS round-robin:
+docker service create --name api \
+  --network backend \
+  --endpoint-mode dnsrr \
+  myapp/api
+# nslookup api => returns all task IPs</code></pre>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 08 — OVERLAY NETWORKING ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">07</span>
+    <h2>Overlay Networking in Swarm</h2>
+  </div>
+  <p>Overlay networks create a <span class="a">distributed network across all Swarm nodes</span>, enabling containers on different hosts to communicate as if they were on the same LAN.</p>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Key Concepts</h3>
+        <ul>
+          <li>Uses VXLAN encapsulation under the hood</li>
+          <li>Encrypted by default with <code>--opt encrypted</code></li>
+          <li>Scoped to services attached to the network</li>
+          <li>Built-in <span class="a">ingress</span> network for published ports</li>
+        </ul>
+      </div>
+      <pre><code class="language-bash"># Create an overlay network
+docker network create \
+  --driver overlay \
+  --subnet 10.0.9.0/24 \
+  --opt encrypted \
+  my-overlay
+
+# Attach services to the network
+docker service create --name web \
+  --network my-overlay \
+  nginx:alpine</code></pre>
+    </div>
+    <div>
+      <div class="card purple">
+        <h3 class="p">Built-in Networks</h3>
+      </div>
+      <table>
+        <thead><tr><th>Network</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><span class="a">ingress</span></td><td>Handles published port routing mesh</td></tr>
+          <tr><td><span class="g">docker_gwbridge</span></td><td>Connects overlay to host network</td></tr>
+          <tr><td><span class="p">user-defined overlay</span></td><td>Service-to-service communication</td></tr>
+        </tbody>
+      </table>
+      <div class="card blue" style="margin-top:0.4em;">
+        <h3 class="b">Network Isolation</h3>
+        <ul>
+          <li>Services on different overlays are isolated</li>
+          <li>A service can join multiple overlay networks</li>
+          <li>Use networks to segment frontend / backend / data tiers</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 09 — LOAD BALANCING ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">08</span>
+    <h2>Load Balancing &amp; Routing Mesh</h2>
+  </div>
+  <p>Swarm provides <span class="a">two layers of load balancing</span>: an external routing mesh (ingress) and internal VIP-based balancing.</p>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Routing Mesh (Ingress)</h3>
+        <ul>
+          <li>Published ports are available on <span class="a">every node</span></li>
+          <li>Hit any node on port 80 &rarr; reaches a running task</li>
+          <li>Even nodes not running the service route traffic</li>
+          <li>Uses IPVS (IP Virtual Server) in the kernel</li>
+        </ul>
+      </div>
+      <div class="ss-row" style="margin-top:0.3em; justify-content:center;">
+        <span class="ss-node">Client :80</span>
+        <span class="ss-arrow">&rarr;</span>
+        <span class="ss-node active">Any Node</span>
+        <span class="ss-arrow">&rarr;</span>
+        <span class="ss-node done">Task (any node)</span>
+      </div>
+    </div>
+    <div>
+      <div class="card green">
+        <h3 class="g">Internal Load Balancing</h3>
+        <ul>
+          <li>Service VIP distributes among healthy tasks</li>
+          <li>Transparent to the application</li>
+          <li>Automatic health-aware routing</li>
+        </ul>
+      </div>
+      <div class="card blue" style="margin-top:0.4em;">
+        <h3 class="b">Bypassing the Mesh</h3>
+        <ul>
+          <li>Use <code>--publish mode=host</code> for direct host binding</li>
+          <li>Needed for source-IP preservation</li>
+          <li>Only reaches task on that specific node</li>
+        </ul>
+      </div>
+      <pre><code class="language-bash"># Default: routing mesh
+docker service create -p 80:80 web
+
+# Host mode: bypass mesh
+docker service create \
+  --publish mode=host,target=80,published=80 \
+  web</code></pre>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 10 — ROLLING UPDATES ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">09</span>
+    <h2>Rolling Updates and Rollbacks</h2>
+  </div>
+  <p>Swarm performs <span class="a">rolling updates</span> by incrementally replacing tasks with the new version, ensuring zero downtime.</p>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Update Configuration</h3>
+      </div>
+      <pre><code class="language-bash"># Update image with rolling strategy
+docker service update \
+  --image nginx:1.27 \
+  --update-parallelism 2 \
+  --update-delay 10s \
+  --update-failure-action rollback \
+  --update-max-failure-ratio 0.25 \
+  --update-order start-first \
+  web</code></pre>
+      <div class="card green" style="margin-top:0.3em;">
+        <h3 class="g">Update Parameters</h3>
+        <ul>
+          <li><span class="a">parallelism</span> &mdash; tasks updated simultaneously</li>
+          <li><span class="a">delay</span> &mdash; wait between batches</li>
+          <li><span class="a">failure-action</span> &mdash; pause, continue, or rollback</li>
+          <li><span class="a">order</span> &mdash; stop-first (default) or start-first</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card red">
+        <h3 class="r">Automatic Rollback</h3>
+      </div>
+      <pre><code class="language-bash"># Rollback to the previous version
+docker service rollback web
+
+# Or configure auto-rollback
+docker service create \
+  --name web \
+  --replicas 6 \
+  --update-failure-action rollback \
+  --rollback-parallelism 2 \
+  --rollback-delay 5s \
+  --rollback-max-failure-ratio 0.1 \
+  nginx:1.26</code></pre>
+      <div class="card purple" style="margin-top:0.3em;">
+        <h3 class="p">Update Lifecycle</h3>
+      </div>
+      <div class="ss-row" style="justify-content:center;">
+        <span class="ss-node active">v1 Running</span>
+        <span class="ss-arrow">&rarr;</span>
+        <span class="ss-node">Drain v1</span>
+        <span class="ss-arrow">&rarr;</span>
+        <span class="ss-node done">Start v2</span>
+        <span class="ss-arrow">&rarr;</span>
+        <span class="ss-node active">v2 Healthy</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 11 — DOCKER STACKS ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">10</span>
+    <h2>Docker Stacks and Stack Files</h2>
+  </div>
+  <p>A <span class="a">stack</span> is a group of related services defined in a Compose file and deployed to a Swarm cluster. Think of it as <span class="g">docker-compose for production</span>.</p>
+  <div class="cols cols-2">
+    <div>
+      <pre><code class="language-yaml"># docker-stack.yml
+version: "3.8"
+services:
+  web:
+    image: myapp/web:2.1
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "80:80"
+    networks:
+      - frontend
+      - backend
+
+  api:
+    image: myapp/api:2.1
+    deploy:
+      replicas: 2
+    networks:
+      - backend
+
+  db:
+    image: postgres:16
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+networks:
+  frontend:
+    driver: overlay
+  backend:
+    driver: overlay
+
+volumes:
+  db-data:</code></pre>
+    </div>
+    <div>
+      <div class="card amber">
+        <h3 class="a">Stack Commands</h3>
+      </div>
+      <pre><code class="language-bash"># Deploy a stack
+docker stack deploy -c docker-stack.yml myapp
+
+# List stacks
+docker stack ls
+
+# List services in a stack
+docker stack services myapp
+
+# List tasks in a stack
+docker stack ps myapp
+
+# Remove a stack
+docker stack rm myapp</code></pre>
+      <div class="card green" style="margin-top:0.3em;">
+        <h3 class="g">Stack vs Compose</h3>
+        <ul>
+          <li>Stacks use the same YAML format as Compose</li>
+          <li>The <code>deploy:</code> key is only used in Swarm mode</li>
+          <li><code>build:</code> is ignored &mdash; stacks require pre-built images</li>
+          <li>Stacks manage services, networks, volumes, secrets</li>
+          <li>Re-deploying a stack performs a rolling update</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 12 — SECRETS AND CONFIGS ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">11</span>
+    <h2>Secrets and Configs in Swarm</h2>
+  </div>
+  <p>Swarm provides <span class="a">first-class secret management</span> &mdash; secrets are encrypted at rest, transmitted only to nodes running tasks that need them, and mounted as in-memory files.</p>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Secrets</h3>
+        <ul>
+          <li>Encrypted in the Raft log at rest</li>
+          <li>Transmitted over TLS to assigned nodes only</li>
+          <li>Mounted as files in <code>/run/secrets/</code></li>
+          <li>Never stored on disk in the container</li>
+          <li>Immutable &mdash; update by rotating</li>
+        </ul>
+      </div>
+      <pre><code class="language-bash"># Create a secret
+echo "s3cureP@ss" | docker secret create db_pass -
+
+# Use in a service
+docker service create --name api \
+  --secret db_pass \
+  myapp/api
+
+# Inside container: cat /run/secrets/db_pass
+
+# Rotate a secret
+echo "newP@ss" | docker secret create db_pass_v2 -
+docker service update \
+  --secret-rm db_pass \
+  --secret-add db_pass_v2 api</code></pre>
+    </div>
+    <div>
+      <div class="card green">
+        <h3 class="g">Configs</h3>
+        <ul>
+          <li>Similar to secrets but for non-sensitive data</li>
+          <li>Not encrypted at rest</li>
+          <li>Mounted at any path in the container</li>
+          <li>Great for config files (nginx.conf, etc.)</li>
+        </ul>
+      </div>
+      <pre><code class="language-bash"># Create a config
+docker config create nginx_conf ./nginx.conf
+
+# Use in a service
+docker service create --name web \
+  --config source=nginx_conf,target=/etc/nginx/nginx.conf \
+  nginx:alpine</code></pre>
+      <div class="card purple" style="margin-top:0.3em;">
+        <h3 class="p">In Stack Files</h3>
+      </div>
+      <pre><code class="language-yaml">secrets:
+  db_password:
+    external: true    # pre-created
+  api_key:
+    file: ./api_key.txt  # from file
+
+services:
+  api:
+    secrets:
+      - db_password
+      - api_key</code></pre>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 13 — PLACEMENT CONSTRAINTS ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">12</span>
+    <h2>Placement Constraints and Preferences</h2>
+  </div>
+  <p>Control <span class="a">where tasks are scheduled</span> using constraints (hard rules) and preferences (soft rules / spread strategies).</p>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Constraints (Hard Rules)</h3>
+        <ul>
+          <li>Task will <span class="r">only</span> run on nodes matching the constraint</li>
+          <li>Based on node labels, role, hostname, engine labels</li>
+        </ul>
+      </div>
+      <pre><code class="language-bash"># Add labels to nodes
+docker node update --label-add zone=eu-west worker1
+docker node update --label-add ssd=true worker2
+
+# Constrain to specific nodes
+docker service create --name db \
+  --constraint 'node.labels.ssd == true' \
+  --constraint 'node.role == worker' \
+  postgres:16
+
+# Constrain to a specific hostname
+docker service create --name monitoring \
+  --constraint 'node.hostname == manager1' \
+  grafana/grafana</code></pre>
+    </div>
+    <div>
+      <div class="card green">
+        <h3 class="g">Preferences (Soft Rules)</h3>
+        <ul>
+          <li>Swarm <span class="g">tries</span> to spread evenly across label values</li>
+          <li>Best-effort &mdash; tasks still schedule if preference cannot be met</li>
+        </ul>
+      </div>
+      <pre><code class="language-bash"># Spread replicas across availability zones
+docker service create --name web \
+  --replicas 6 \
+  --placement-pref 'spread=node.labels.zone' \
+  nginx:alpine
+# 2 tasks in zone=eu-west
+# 2 tasks in zone=eu-central
+# 2 tasks in zone=us-east</code></pre>
+      <div class="card blue" style="margin-top:0.3em;">
+        <h3 class="b">In Stack Files</h3>
+      </div>
+      <pre><code class="language-yaml">deploy:
+  placement:
+    constraints:
+      - node.labels.ssd == true
+    preferences:
+      - spread: node.labels.zone</code></pre>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 14 — HEALTH CHECKS & SELF-HEALING ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">13</span>
+    <h2>Health Checks and Self-Healing</h2>
+  </div>
+  <p>Swarm continuously monitors task health. When a task becomes <span class="r">unhealthy</span> or a node goes down, the orchestrator <span class="g">automatically reschedules</span> tasks to maintain desired state.</p>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Health Check Config</h3>
+      </div>
+      <pre><code class="language-bash"># Define health check on service
+docker service create --name web \
+  --health-cmd "curl -f http://localhost/ || exit 1" \
+  --health-interval 30s \
+  --health-timeout 10s \
+  --health-retries 3 \
+  --health-start-period 60s \
+  nginx:alpine</code></pre>
+      <pre><code class="language-dockerfile"># Or in the Dockerfile
+HEALTHCHECK --interval=30s --timeout=10s \
+  --retries=3 --start-period=60s \
+  CMD curl -f http://localhost/ || exit 1</code></pre>
+    </div>
+    <div>
+      <div class="card green">
+        <h3 class="g">Self-Healing Behaviour</h3>
+        <ul>
+          <li>Unhealthy task &rarr; stopped and replaced</li>
+          <li>Node failure &rarr; tasks rescheduled to healthy nodes</li>
+          <li>Manager failure &rarr; Raft elects a new leader</li>
+          <li>Desired state always reconciled by the orchestrator</li>
+        </ul>
+      </div>
+      <div class="card red" style="margin-top:0.3em;">
+        <h3 class="r">Restart Policies</h3>
+      </div>
+      <pre><code class="language-yaml">deploy:
+  restart_policy:
+    condition: on-failure  # none | on-failure | any
+    delay: 5s
+    max_attempts: 3
+    window: 120s</code></pre>
+      <div class="ss-row" style="margin-top:0.3em; justify-content:center;">
+        <span class="ss-node active">Running</span>
+        <span class="ss-arrow">&rarr;</span>
+        <span class="ss-node" style="border-color:var(--red); color:var(--red);">Unhealthy</span>
+        <span class="ss-arrow">&rarr;</span>
+        <span class="ss-node">Stopped</span>
+        <span class="ss-arrow">&rarr;</span>
+        <span class="ss-node active">New Task</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 15 — SCALING STRATEGIES ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">14</span>
+    <h2>Scaling Strategies</h2>
+  </div>
+  <p>Scale services up or down with a <span class="a">single command</span>. Swarm distributes new tasks across available nodes automatically.</p>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Manual Scaling</h3>
+      </div>
+      <pre><code class="language-bash"># Scale a single service
+docker service scale web=10
+
+# Scale multiple services at once
+docker service scale web=10 api=5 worker=8
+
+# Scale down
+docker service scale web=2
+
+# Update replicas (alternative)
+docker service update --replicas 10 web</code></pre>
+      <div class="card green" style="margin-top:0.3em;">
+        <h3 class="g">Resource Limits</h3>
+      </div>
+      <pre><code class="language-yaml">deploy:
+  resources:
+    limits:
+      cpus: '0.50'
+      memory: 512M
+    reservations:
+      cpus: '0.25'
+      memory: 256M</code></pre>
+    </div>
+    <div>
+      <div class="card purple">
+        <h3 class="p">Scaling Patterns</h3>
+        <ul>
+          <li><span class="a">Horizontal</span> &mdash; increase replicas across nodes</li>
+          <li><span class="g">Vertical</span> &mdash; increase CPU/memory limits</li>
+          <li><span class="p">Node scaling</span> &mdash; add more worker nodes to the swarm</li>
+          <li><span class="b">Global services</span> &mdash; auto-scale with cluster size</li>
+        </ul>
+      </div>
+      <div class="card blue" style="margin-top:0.3em;">
+        <h3 class="b">Best Practices</h3>
+        <ul>
+          <li>Set resource reservations so the scheduler can bin-pack</li>
+          <li>Use placement preferences to spread across zones</li>
+          <li>Monitor with <code>docker service ps</code> to verify distribution</li>
+          <li>Combine with external autoscalers (Orbiter, Docker Flow) for automatic scaling</li>
+          <li>Use global mode for per-node agents (log shippers, exporters)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 16 — MONITORING ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">15</span>
+    <h2>Monitoring Swarm Clusters</h2>
+  </div>
+  <p>Effective monitoring covers <span class="a">cluster health</span>, <span class="g">service metrics</span>, and <span class="p">container-level resource usage</span>.</p>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Built-in Commands</h3>
+      </div>
+      <pre><code class="language-bash"># Cluster overview
+docker node ls
+docker service ls
+
+# Task health and placement
+docker service ps web --no-trunc
+
+# Container stats (per node)
+docker stats
+
+# System-wide info
+docker system df
+docker info</code></pre>
+      <div class="card green" style="margin-top:0.3em;">
+        <h3 class="g">Prometheus Stack</h3>
+        <ul>
+          <li><span class="a">cAdvisor</span> &mdash; container metrics (CPU, mem, net)</li>
+          <li><span class="g">Node Exporter</span> &mdash; host-level metrics</li>
+          <li><span class="p">Prometheus</span> &mdash; scrapes &amp; stores time series</li>
+          <li><span class="b">Grafana</span> &mdash; dashboards &amp; alerting</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card purple">
+        <h3 class="p">Monitoring Stack (as Swarm services)</h3>
+      </div>
+      <pre><code class="language-yaml">services:
+  prometheus:
+    image: prom/prometheus
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports: ["9090:9090"]
+
+  grafana:
+    image: grafana/grafana
+    ports: ["3000:3000"]
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor
+    deploy:
+      mode: global   # one per node
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+
+  node-exporter:
+    image: prom/node-exporter
+    deploy:
+      mode: global</code></pre>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 17 — SWARM VS KUBERNETES ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">16</span>
+    <h2>Swarm vs Kubernetes</h2>
+  </div>
+  <table>
+    <thead>
+      <tr><th>Aspect</th><th><span class="a">Docker Swarm</span></th><th><span class="b">Kubernetes</span></th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Setup complexity</td><td>One command (<code>docker swarm init</code>)</td><td>Multiple components (API server, etcd, kubelet, etc.)</td></tr>
+      <tr><td>Learning curve</td><td>Gentle &mdash; extends familiar Docker CLI</td><td>Steep &mdash; new concepts (Pods, Deployments, Ingress...)</td></tr>
+      <tr><td>Auto-scaling</td><td>Manual or external tools</td><td>Built-in HPA/VPA, KEDA</td></tr>
+      <tr><td>Networking</td><td>Simple overlay + routing mesh</td><td>CNI plugins (Calico, Cilium, Flannel...)</td></tr>
+      <tr><td>Service mesh</td><td>Not built-in</td><td>Istio, Linkerd, Cilium mesh</td></tr>
+      <tr><td>Storage</td><td>Docker volumes, NFS plugins</td><td>CSI drivers, PVs/PVCs, StorageClasses</td></tr>
+      <tr><td>Ecosystem</td><td>Smaller, Docker-focused</td><td>Massive (Helm, Operators, CRDs, GitOps...)</td></tr>
+      <tr><td>Production adoption</td><td>Niche / small-medium workloads</td><td>Industry standard, all cloud providers</td></tr>
+      <tr><td>Configuration</td><td>Compose YAML (familiar)</td><td>K8s manifests (verbose)</td></tr>
+      <tr><td>Community</td><td>Smaller, less active</td><td>Huge, CNCF backed</td></tr>
+    </tbody>
+  </table>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 18 — WHEN TO USE WHAT ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">17</span>
+    <h2>When to Use Swarm vs Kubernetes</h2>
+  </div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Choose Docker Swarm When...</h3>
+        <ul>
+          <li>You want the <span class="a">simplest path to orchestration</span></li>
+          <li>Your team already knows Docker and Docker Compose</li>
+          <li>Small to medium cluster (3&ndash;20 nodes)</li>
+          <li>You need something production-ready in hours, not weeks</li>
+          <li>Internal / non-critical workloads</li>
+          <li>No dedicated platform / DevOps team</li>
+          <li>Limited budget &mdash; no managed K8s costs</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card blue">
+        <h3 class="b">Choose Kubernetes When...</h3>
+        <ul>
+          <li>You need <span class="b">auto-scaling and advanced scheduling</span></li>
+          <li>Large-scale deployments (50+ nodes, 100s of services)</li>
+          <li>Multi-cloud or hybrid-cloud strategy</li>
+          <li>You need a service mesh, advanced ingress, CRDs</li>
+          <li>Strong ecosystem requirements (Helm charts, Operators)</li>
+          <li>You have a dedicated platform team</li>
+          <li>Managed K8s available (EKS, GKE, AKS)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="card green" style="margin-top:0.5em;">
+    <h3 class="g">The Middle Ground</h3>
+    <p>Start with <span class="a">Swarm</span> to learn orchestration concepts (services, replicas, rolling updates, overlay networks). These concepts transfer directly to Kubernetes. Many teams start with Swarm and migrate to K8s when they outgrow it.</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 19 — SUMMARY ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">18</span>
+    <h2>Summary &amp; Further Reading</h2>
+  </div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Key Takeaways</h3>
+        <ul>
+          <li>Docker Swarm is the <span class="a">simplest container orchestrator</span></li>
+          <li>Built into Docker Engine &mdash; no extra installs</li>
+          <li>Manager/worker architecture with Raft consensus</li>
+          <li>Declarative services with automatic reconciliation</li>
+          <li>Built-in DNS, overlay networking, routing mesh</li>
+          <li>Rolling updates and automatic rollback</li>
+          <li>Secrets management and config injection</li>
+          <li>Self-healing: failed tasks are rescheduled</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card green">
+        <h3 class="g">Essential Commands</h3>
+        <ul>
+          <li><code>docker swarm init</code> &mdash; create a cluster</li>
+          <li><code>docker service create</code> &mdash; deploy a service</li>
+          <li><code>docker service scale</code> &mdash; scale replicas</li>
+          <li><code>docker service update</code> &mdash; rolling update</li>
+          <li><code>docker stack deploy</code> &mdash; deploy from Compose</li>
+          <li><code>docker node ls</code> &mdash; inspect cluster</li>
+        </ul>
+      </div>
+      <div class="card purple" style="margin-top:0.4em;">
+        <h3 class="p">Further Reading</h3>
+        <ul>
+          <li><a href="https://docs.docker.com/engine/swarm/" style="color:var(--blue);">Docker Swarm Official Docs</a></li>
+          <li><a href="https://docs.docker.com/engine/swarm/swarm-tutorial/" style="color:var(--blue);">Swarm Getting Started Tutorial</a></li>
+          <li><a href="https://docs.docker.com/engine/swarm/admin_guide/" style="color:var(--blue);">Administer a Swarm</a></li>
+          <li><a href="https://github.com/dockersamples/example-voting-app" style="color:var(--blue);">Example Voting App (Swarm Stack)</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+</div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/plugin/highlight/highlight.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/plugin/highlight/monokai.min.css">
+<script>
+Reveal.initialize({ hash:true, slideNumber:'c/t', transition:'fade', transitionSpeed:'fast', controls:true, progress:true, center:false, width:1100, height:900, margin:0.01, plugins:[RevealHighlight], highlight:{theme:'monokai'} });
+</script>
+<script>
+(function(){ var h=Reveal.getConfig().height||900; var m=Reveal.getConfig().margin||0.02; var maxH=Math.floor(h*(1-2*m))+'px'; function fixSlides(){ document.querySelectorAll('.reveal .slides>section,.reveal .slides>section>section').forEach(function(s){ s.style.display='block'; s.style.maxHeight=maxH; }); } Reveal.on('ready',fixSlides); Reveal.on('slidechanged',fixSlides); })();
+</script>
+</body></html>
