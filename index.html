@@ -8,9 +8,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/black.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/white.min.css">
 <style>
-  :root { --amber:#f5a623; --green:#4ecb8d; --purple:#a78bfa; --blue:#60a5fa; --red:#f87171; --bg:#0a0a0f; --bg2:#10101a; --bg3:#181824; --border:#2a2a3a; --text:#e8e8f0; --muted:#8888a8; }
+  :root { --amber:#af7e0f; --green:#217566; --purple:#4e4392; --blue:#204d89; --red:#bb2233; --bg:#eaeff2; --bg2:#e1e8ec; --bg3:#d9e1e6; --border:#b9c7d0; --text:#14273b; --muted:#5c6e7b; }
   .reveal-viewport { background: var(--bg); }
   .reveal .slides section { background: transparent; }
   .reveal { font-family: 'DM Sans', sans-serif; color: var(--text); }
@@ -22,7 +22,7 @@
   .reveal li { font-size: .54em; line-height: 1.45; margin-bottom: .1em; }
   .reveal code { font-family: 'JetBrains Mono', monospace; font-size: .72em; }
   .reveal pre { box-shadow: none; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: .3em .5em; margin: .25em 0; }
-  .reveal pre code { font-size: .52em; line-height: 1.35; background: transparent; color: #cdd6f4; }
+  .reveal pre code { font-size: .52em; line-height: 1.35; background: transparent; color: #213343; }
   .slide-hdr { display: flex; align-items: center; gap: .4em; border-bottom: 1px solid var(--border); padding-bottom: .2em; margin-bottom: .3em; }
   .slide-hdr .tag { font-family: 'JetBrains Mono', monospace; font-size: .42em; font-weight: 500; color: var(--bg); background: var(--amber); padding: .1em .4em; border-radius: 3px; letter-spacing: .04em; }
   .slide-hdr h2 { margin: 0; font-size: .95em; }
@@ -31,12 +31,12 @@
   .card.amber { border-left: 3px solid var(--amber); } .card.green { border-left: 3px solid var(--green); }
   .card.purple { border-left: 3px solid var(--purple); } .card.blue { border-left: 3px solid var(--blue); }
   .card.red { border-left: 3px solid var(--red); }
-  .card h3 { font-size: .64em; margin: 0 0 .12em; } .card p { font-size: .52em; margin: 0; color: #b8b8d0; }
-  .card ul { margin: 0; padding-left: 1em; } .card li { font-size: .52em; color: #b8b8d0; margin-bottom: .02em; }
+  .card h3 { font-size: .64em; margin: 0 0 .12em; } .card p { font-size: .52em; margin: 0; color: #354552; }
+  .card ul { margin: 0; padding-left: 1em; } .card li { font-size: .52em; color: #354552; margin-bottom: .02em; }
   .reveal table { width: 100%; border-collapse: collapse; font-size: .5em; }
   .reveal table th { background: var(--bg3); color: var(--amber); font-weight: 600; padding: .2em .4em; border: 1px solid var(--border); text-align: left; }
-  .reveal table td { padding: .18em .4em; border: 1px solid var(--border); color: #ccc; }
-  .reveal table tr:nth-child(even) td { background: #0e0e18; }
+  .reveal table td { padding: .18em .4em; border: 1px solid var(--border); color: #283948; }
+  .reveal table tr:nth-child(even) td { background: #e3eaee; }
   .a { color: var(--amber); font-weight: 600; } .g { color: var(--green); font-weight: 600; }
   .p { color: var(--purple); font-weight: 600; } .b { color: var(--blue); font-weight: 600; }
   .r { color: var(--red); font-weight: 600; } .mono { font-family: 'JetBrains Mono', monospace; }
@@ -49,12 +49,13 @@
   .title-slide .meta { font-size: .48em; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
   .ss-row { display: flex; gap: .25em; align-items: center; margin: .1em 0; font-size: .55em; font-family: 'JetBrains Mono', monospace; }
   .ss-node { padding: .2em .55em; border-radius: 5px; font-size: .9em; background: var(--bg3); border: 1px solid var(--border); color: var(--text); }
-  .ss-node.active { background: #1a2a1a; border-color: var(--green); color: var(--green); }
-  .ss-node.done { background: #1a1a2a; border-color: var(--purple); color: var(--purple); }
+  .ss-node.active { background: #c4d4d1; border-color: var(--green); color: var(--green); }
+  .ss-node.done { background: #d4dde4; border-color: var(--purple); color: var(--purple); }
   .ss-arrow { color: var(--amber); }
   .reveal ul, .reveal ol { margin: .15em 0 .15em 1em; }
   .reveal .slides > section { display: flex !important; flex-direction: column !important; overflow-y: auto !important; align-items: stretch !important; justify-content: flex-start !important; }
 </style>
+<style>.reveal .slide-number{background-color:transparent}</style>
 </head>
 <body>
 <div class="reveal">
@@ -62,7 +63,7 @@
 
 
 <!-- ═══════════════════════════════ SLIDE 01 — TITLE ═══════════════════════════════ -->
-<section class="title-slide" data-background-color="#0a0a0f">
+<section class="title-slide" data-background-color="#eaeff2">
   <div style="text-align:left; max-width:820px; margin:0 auto; padding: 1em 0;">
     <div style="font-family:'JetBrains Mono',monospace; font-size:.5em; color:var(--muted); margin-bottom:.4em; letter-spacing:.1em;">
       TECHNICAL PRESENTATION
@@ -87,7 +88,7 @@
       <span class="ss-arrow">&rarr;</span>
       <span class="ss-node done">Monitor</span>
     </div>
-    <p style="max-width:620px; color:#a0a0c0; font-size:.56em; line-height:1.5; margin-top:1em;">
+    <p style="max-width:620px; color:#475865; font-size:.56em; line-height:1.5; margin-top:1em;">
       Native Docker clustering &mdash; turning a pool of Docker hosts into a single virtual system for high-availability, load balancing, and zero-downtime deployments.
     </p>
     <div class="meta" style="margin-top:1.4em;">
@@ -98,7 +99,7 @@
 
 
 <!-- ═══════════════════════════════ SLIDE 02 — TOPICS ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">01</span>
     <h2>Topics</h2>
@@ -149,7 +150,7 @@
 
 
 <!-- ═══════════════════════════════ SLIDE 03 — WHAT IS ORCHESTRATION ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">02</span>
     <h2>What Is Container Orchestration?</h2>
@@ -189,7 +190,7 @@
 
 
 <!-- ═══════════════════════════════ SLIDE 04 — SWARM ARCHITECTURE ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">03</span>
     <h2>Docker Swarm Architecture</h2>
@@ -252,7 +253,7 @@
 
 
 <!-- ═══════════════════════════════ SLIDE 05 — INITIALISING A SWARM ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">04</span>
     <h2>Initialising a Swarm Cluster</h2>
@@ -302,7 +303,7 @@ docker node ls
 
 
 <!-- ═══════════════════════════════ SLIDE 06 — SERVICES, TASKS, REPLICAS ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">05</span>
     <h2>Services, Tasks, and Replicas</h2>
@@ -359,7 +360,7 @@ docker service logs web</code></pre>
 
 
 <!-- ═══════════════════════════════ SLIDE 07 — SERVICE DISCOVERY & DNS ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">06</span>
     <h2>Service Discovery and DNS</h2>
@@ -413,7 +414,7 @@ docker service create --name api \
 
 
 <!-- ═══════════════════════════════ SLIDE 08 — OVERLAY NETWORKING ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">07</span>
     <h2>Overlay Networking in Swarm</h2>
@@ -468,7 +469,7 @@ docker service create --name web \
 
 
 <!-- ═══════════════════════════════ SLIDE 09 — LOAD BALANCING ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">08</span>
     <h2>Load Balancing &amp; Routing Mesh</h2>
@@ -523,7 +524,7 @@ docker service create \
 
 
 <!-- ═══════════════════════════════ SLIDE 10 — ROLLING UPDATES ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">09</span>
     <h2>Rolling Updates and Rollbacks</h2>
@@ -587,7 +588,7 @@ docker service create \
 
 
 <!-- ═══════════════════════════════ SLIDE 11 — DOCKER STACKS ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">10</span>
     <h2>Docker Stacks and Stack Files</h2>
@@ -670,7 +671,7 @@ docker stack rm myapp</code></pre>
 
 
 <!-- ═══════════════════════════════ SLIDE 12 — SECRETS AND CONFIGS ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">11</span>
     <h2>Secrets and Configs in Swarm</h2>
@@ -741,7 +742,7 @@ services:
 
 
 <!-- ═══════════════════════════════ SLIDE 13 — PLACEMENT CONSTRAINTS ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">12</span>
     <h2>Placement Constraints and Preferences</h2>
@@ -802,7 +803,7 @@ docker service create --name web \
 
 
 <!-- ═══════════════════════════════ SLIDE 14 — HEALTH CHECKS & SELF-HEALING ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">13</span>
     <h2>Health Checks and Self-Healing</h2>
@@ -860,7 +861,7 @@ HEALTHCHECK --interval=30s --timeout=10s \
 
 
 <!-- ═══════════════════════════════ SLIDE 15 — SCALING STRATEGIES ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">14</span>
     <h2>Scaling Strategies</h2>
@@ -920,7 +921,7 @@ docker service update --replicas 10 web</code></pre>
 
 
 <!-- ═══════════════════════════════ SLIDE 16 — MONITORING ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">15</span>
     <h2>Monitoring Swarm Clusters</h2>
@@ -991,7 +992,7 @@ docker info</code></pre>
 
 
 <!-- ═══════════════════════════════ SLIDE 17 — SWARM VS KUBERNETES ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">16</span>
     <h2>Swarm vs Kubernetes</h2>
@@ -1017,7 +1018,7 @@ docker info</code></pre>
 
 
 <!-- ═══════════════════════════════ SLIDE 18 — WHEN TO USE WHAT ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">17</span>
     <h2>When to Use Swarm vs Kubernetes</h2>
@@ -1060,7 +1061,7 @@ docker info</code></pre>
 
 
 <!-- ═══════════════════════════════ SLIDE 19 — SUMMARY ═══════════════════════════════ -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#eaeff2">
   <div class="slide-hdr">
     <span class="tag">18</span>
     <h2>Summary &amp; Further Reading</h2>
@@ -1110,7 +1111,7 @@ docker info</code></pre>
 </div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/plugin/highlight/highlight.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/plugin/highlight/monokai.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
 <script>
 Reveal.initialize({ hash:true, slideNumber:'c/t', transition:'fade', transitionSpeed:'fast', controls:true, progress:true, center:false, width:1100, height:900, margin:0.01, plugins:[RevealHighlight], highlight:{theme:'monokai'} });
 </script>
